@@ -1,5 +1,6 @@
 import {useCallback, useState} from 'react'
 import type {Task} from "./model/task.ts";
+import styles from './todo-list-component.module.css'
 
 export interface TodoListProps {
     defaultTasks: Task[]
@@ -14,7 +15,8 @@ function TodoListComponent({defaultTasks}: TodoListProps) {
 
     return (
         <div>
-            <pre>TODO list</pre>
+            <h2>TODO list</h2>
+            {tasks.length === 0 && <p>No tasks yet.</p>}
             <ul>
                 {tasks.map(task => (
                     <li key={task.id}>
@@ -23,9 +25,9 @@ function TodoListComponent({defaultTasks}: TodoListProps) {
                             checked={task.done}
                             onChange={() => toggle(task.id)}
                         />
-                        <span style={{textDecoration: task.done ? 'line-through' : 'none'}}>
-            {task.label}
-          </span>
+                        <span className={task.done ? styles.taskDone : undefined}>
+                            {task.label}
+                        </span>
                     </li>
                 ))}
             </ul>
