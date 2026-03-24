@@ -1,26 +1,53 @@
 .stats {
-    display: flex;
-    gap: 1rem;
-    padding: 0.5rem 0.75rem;
-    background: #f4f4f4;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    color: #555;
-    margin: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  font-size: 0.825rem;
+  color: var(--text);
+  margin: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.stat::after {
+  content: '·';
+  margin-left: 0.5rem;
+  opacity: 0.4;
+}
+
+.stat:last-child::after {
+  content: '';
 }
 
 .stat span {
-    font-weight: 600;
-    color: #222;
+  font-weight: 600;
+  color: var(--accent);
 }
 
 @keyframes pop {
-    0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
-    60%  { transform: scale(1.4) rotate(10deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  0% {
+    transform: scale(0) rotate(-15deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.4) rotate(10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 .fireworks {
-    display: inline-block;
-    animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  display: inline-block;
+  animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }

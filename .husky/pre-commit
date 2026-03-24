@@ -3,7 +3,7 @@ export NVM_DIR="$HOME/.nvm"
 nvm use --lts --silent
 
 echo "Running frontend format..."
-cd frontend && npx prettier --write "src/**/*.{ts,tsx}" && cd ..
+cd frontend && npm run format && cd ..
 
 echo "Running backend format..."
 cd backend && npm run format && cd ..

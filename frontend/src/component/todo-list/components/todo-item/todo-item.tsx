@@ -6,9 +6,10 @@ export interface Props {
   todo: Todo
   onToggle: (id: string) => void
   onEdit: (id: string, text: string) => void
+  onDelete: (id: string) => void
 }
 
-function TodoItem({ todo, onToggle, onEdit }: Props) {
+function TodoItem({ todo, onToggle, onEdit, onDelete }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(todo.text)
 
@@ -24,7 +25,6 @@ function TodoItem({ todo, onToggle, onEdit }: Props) {
           className={styles.editInput}
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
-          onBlur={commitEdit}
           onKeyDown={(e) => {
             if (e.key === 'Enter') commitEdit()
             if (e.key === 'Escape') {
@@ -34,6 +34,13 @@ function TodoItem({ todo, onToggle, onEdit }: Props) {
           }}
           autoFocus
         />
+        <button
+          className={styles.deleteButton}
+          onClick={() => onDelete(todo.id)}
+          title="Remove"
+        >
+          ✕
+        </button>
       </li>
     )
   }
@@ -41,6 +48,7 @@ function TodoItem({ todo, onToggle, onEdit }: Props) {
   return (
     <li className={`${styles.item} ${todo.complete ? styles.complete : ''}`}>
       <input
+        className={styles.checkbox}
         type="checkbox"
         checked={todo.complete}
         onChange={() => onToggle(todo.id)}
@@ -48,9 +56,17 @@ function TodoItem({ todo, onToggle, onEdit }: Props) {
       <span
         className={`${styles.label} ${todo.complete ? styles.done : ''}`}
         onDoubleClick={() => setIsEditing(true)}
+        title="Double tap to edit"
       >
         {todo.text}
       </span>
+      <button
+        className={styles.deleteButton}
+        onClick={() => onDelete(todo.id)}
+        title="Remove"
+      >
+        ✕
+      </button>
     </li>
   )
 }

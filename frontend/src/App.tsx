@@ -1,56 +1,68 @@
-import { useCallback, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useEffect, useState } from 'react'
 import './App.css'
 import TodoList from './component/todo-list/components/todo-list/todo-list.tsx'
 import TodoStats from './component/todo-list/components/todo-stats/todo-stats.tsx'
 import type { Todo } from './component/todo-list/model/todo.ts'
 
+const loadTodos = (): Todo[] => {
+  const saved = localStorage.getItem('todos')
+  if (!saved) return []
+
+  try {
+    return JSON.parse(saved) as Todo[]
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error parsing todos', error.message)
+    }
+    return []
+  }
+}
+
 function App() {
-  const mockedTodos = [
-    { id: '1', text: 'Learn React fundamentals', complete: false },
-    { id: '2', text: 'Master TypeScript props', complete: true },
-  ]
+  const [todos, setTodos] = useState<Todo[]>(loadTodos)
 
-  const [count, setCount] = useState(0)
-  const [todos, setTodos] = useState<Todo[]>(mockedTodos)
-
-  const onToggle = useCallback((id: string) => {
+  const onToggle = (id: string) =>
     setTodos((prev) =>
       prev.map((todo) =>
         todo.id === id ? { ...todo, complete: !todo.complete } : todo
       )
     )
-  }, [])
 
-  const onEdit = (id: string, text: string) => {
-    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, text } : todo)))
-  }
+  const onCreate = (text: string) =>
+    setTodos((prev) => {
+      const nextId =
+        prev.length === 0
+          ? 1
+          : Math.max(...prev.map((todo) => parseInt(todo.id))) + 1
+      return [...prev, { id: nextId.toString(), text, complete: false }]
+    })
+
+  const onEdit = (id: string, text: string) =>
+    setTodos((prev) =>
+      prev.map((todo) => (todo.id === id ? { ...todo, text } : todo))
+    )
+
+  const onDelete = (id: string) =>
+    setTodos((prev) => prev.filter((todo) => todo.id !== id))
+
+  const sortedTodos = [...todos].sort((a, b) => parseInt(a.id) - parseInt(b.id))
+
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }, [todos])
 
   return (
     <>
       <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+        <TodoList
+          todos={sortedTodos}
+          onToggle={onToggle}
+          onEdit={onEdit}
+          onCreate={onCreate}
+          onDelete={onDelete}
+        />
       </section>
       <section id="spacer"></section>
-      <TodoList todos={todos} onToggle={onToggle} onEdit={onEdit} />
       <TodoStats todos={todos} />
     </>
   )

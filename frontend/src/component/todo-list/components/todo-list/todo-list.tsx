@@ -1,25 +1,88 @@
 import TodoItem from '../todo-item/todo-item.tsx'
 import type { Todo } from '../../model/todo.ts'
 import styles from './todo-list.module.css'
+import { useState } from 'react'
 
 export interface Props {
   todos: Todo[]
   onToggle: (id: string) => void
+  onCreate: (text: string) => void
   onEdit: (id: string, text: string) => void
+  onDelete: (id: string) => void
 }
 
-function TodoList({ todos, onToggle, onEdit }: Props) {
+const FILTERS = ['all', 'pending', 'completed'] as const
+type Filter = (typeof FILTERS)[number]
+const FILTER_FN: Record<Filter, (t: Todo) => boolean> = {
+  all: () => true,
+  pending: (t) => !t.complete,
+  completed: (t) => t.complete
+}
+
+function TodoList({ todos, onToggle, onCreate, onEdit, onDelete }: Props) {
+  const [filter, setFilter] = useState<Filter>(FILTERS[0])
+  const [text, setText] = useState('')
+
+  const filteredTodos = todos.filter(FILTER_FN[filter])
+  const noTodos = todos.length === 0
+  const noFilteredTodos = todos.length > 0 && filteredTodos.length === 0
+
+  const commitNew = () => {
+    if (!text.trim()) return
+    onCreate(text.trim())
+    setText('')
+  }
+
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>TODO list</h2>
-      {todos.length === 0 && <p className={styles.empty}>No todos yet.</p>}
+      <h2 className={styles.title}>Todo List</h2>
+
+      <div className={styles.controls}>
+        <input
+          id="add"
+          className={styles.addInput}
+          placeholder="What needs to be done?"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') commitNew()
+            if (e.key === 'Escape') setText('')
+          }}
+        />
+        <button
+          className={styles.addButton}
+          onClick={commitNew}
+          disabled={!text.trim()}
+        >
+          Add
+        </button>
+      </div>
+
+      <div className={styles.filterRow}>
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            className={`${styles.filterButton} ${filter === f ? styles.active : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {noTodos && <p className={styles.empty}>No todos yet.</p>}
+      {noFilteredTodos && (
+        <p className={styles.empty}>No {filter} todos.</p>
+      )}
+
       <ul className={styles.list}>
-        {todos.map((todo) => (
+        {filteredTodos.map((todo) => (
           <TodoItem
             key={todo.id}
             todo={todo}
             onToggle={onToggle}
             onEdit={onEdit}
+            onDelete={onDelete}
           />
         ))}
       </ul>
