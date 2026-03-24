@@ -1,12 +1,32 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
-import TodoList from './component/todo-list/todo-list-component.tsx'
+import TodoList from './component/todo-list/components/todo-list/todo-list.tsx'
+import TodoStats from './component/todo-list/components/todo-stats/todo-stats.tsx'
+import type { Todo } from './component/todo-list/model/todo.ts'
 
 function App() {
+  const mockedTodos = [
+    { id: '1', text: 'Learn React fundamentals', complete: false },
+    { id: '2', text: 'Master TypeScript props', complete: true },
+  ]
+
   const [count, setCount] = useState(0)
+  const [todos, setTodos] = useState<Todo[]>(mockedTodos)
+
+  const onToggle = useCallback((id: string) => {
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === id ? { ...todo, complete: !todo.complete } : todo
+      )
+    )
+  }, [])
+
+  const onEdit = (id: string, text: string) => {
+    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, text } : todo)))
+  }
 
   return (
     <>
@@ -30,10 +50,8 @@ function App() {
         </button>
       </section>
       <section id="spacer"></section>
-      <TodoList defaultTasks={[
-        { id: 1, label: 'Learn TypeScript', done: false },
-        { id: 2, label: 'Build something', done: false },
-      ]}/>
+      <TodoList todos={todos} onToggle={onToggle} onEdit={onEdit} />
+      <TodoStats todos={todos} />
     </>
   )
 }

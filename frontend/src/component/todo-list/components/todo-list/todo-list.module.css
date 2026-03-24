@@ -1,0 +1,25 @@
+.container {
+    max-width: 480px;
+    margin: 2rem auto;
+    font-family: sans-serif;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.empty {
+    color: #888;
+    font-style: italic;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}

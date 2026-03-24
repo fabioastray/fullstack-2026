@@ -1,0 +1,24 @@
+{
+  "name": "fullstack-2026",
+  "version": "1.0.0",
+  "description": "a readme",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabioastray/fullstack-2026.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fabioastray/fullstack-2026/issues"
+  },
+  "homepage": "https://github.com/fabioastray/fullstack-2026#readme",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
