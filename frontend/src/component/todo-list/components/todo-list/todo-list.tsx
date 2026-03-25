@@ -4,6 +4,7 @@ import styles from './todo-list.module.css'
 import { useState } from 'react'
 
 export interface Props {
+  loading: boolean
   todos: Todo[]
   onToggle: (id: string) => void
   onCreate: (text: string) => void
@@ -19,7 +20,14 @@ const FILTER_FN: Record<Filter, (t: Todo) => boolean> = {
   completed: (t) => t.complete
 }
 
-function TodoList({ todos, onToggle, onCreate, onEdit, onDelete }: Props) {
+function TodoList({
+  loading,
+  todos,
+  onToggle,
+  onCreate,
+  onEdit,
+  onDelete
+}: Props) {
   const [filter, setFilter] = useState<Filter>(FILTERS[0])
   const [text, setText] = useState('')
 
@@ -33,6 +41,15 @@ function TodoList({ todos, onToggle, onCreate, onEdit, onDelete }: Props) {
     setText('')
   }
 
+  const onChange = (value: string) => setText(value)
+
+  const onKeyDown = (key: string) => {
+    if (key === 'Enter') commitNew()
+    if (key === 'Escape') setText('')
+  }
+
+  if (loading) return <p>Loading...</p>
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Todo List</h2>
@@ -43,11 +60,8 @@ function TodoList({ todos, onToggle, onCreate, onEdit, onDelete }: Props) {
           className={styles.addInput}
           placeholder="What needs to be done?"
           value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') commitNew()
-            if (e.key === 'Escape') setText('')
-          }}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => onKeyDown(e.key)}
         />
         <button
           className={styles.addButton}
@@ -71,9 +85,7 @@ function TodoList({ todos, onToggle, onCreate, onEdit, onDelete }: Props) {
       </div>
 
       {noTodos && <p className={styles.empty}>No todos yet.</p>}
-      {noFilteredTodos && (
-        <p className={styles.empty}>No {filter} todos.</p>
-      )}
+      {noFilteredTodos && <p className={styles.empty}>No {filter} todos.</p>}
 
       <ul className={styles.list}>
         {filteredTodos.map((todo) => (

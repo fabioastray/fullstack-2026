@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import type { Todo } from '../../model/todo.ts'
 import styles from './todo-item.module.css'
+
+const EDIT_DEBOUNCE_MS = 500
 
 export interface Props {
   todo: Todo
@@ -13,9 +16,28 @@ function TodoItem({ todo, onToggle, onEdit, onDelete }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(todo.text)
 
+  const debouncedEdit = useDebouncedCallback(
+    (text: string) => onEdit(todo.id, text),
+    EDIT_DEBOUNCE_MS
+  )
+
   const commitEdit = () => {
+    debouncedEdit.flush()
     setIsEditing(false)
-    onEdit(todo.id, editText)
+  }
+
+  const onChange = (value: string) => {
+    setEditText(value)
+    debouncedEdit(value)
+  }
+
+  const onKeyDown = (key: string) => {
+    if (key === 'Enter') commitEdit()
+    if (key === 'Escape') {
+      debouncedEdit.cancel()
+      setEditText(todo.text)
+      setIsEditing(false)
+    }
   }
 
   if (isEditing) {
@@ -24,14 +46,8 @@ function TodoItem({ todo, onToggle, onEdit, onDelete }: Props) {
         <input
           className={styles.editInput}
           value={editText}
-          onChange={(e) => setEditText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') commitEdit()
-            if (e.key === 'Escape') {
-              setEditText(todo.text)
-              setIsEditing(false)
-            }
-          }}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => onKeyDown(e.key)}
           autoFocus
         />
         <button
