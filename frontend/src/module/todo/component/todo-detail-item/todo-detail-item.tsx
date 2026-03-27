@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import Spinner from '../../../../common/component/spinner/spinner.tsx'
 
 export interface Props {
-  id: string
+  id: string | undefined
 }
 
 function TodoDetailItem({ id }: Props) {
