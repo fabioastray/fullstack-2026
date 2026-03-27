@@ -2,17 +2,15 @@ import TodoItem from '../todo-item/todo-item.tsx'
 import styles from './todo-list.module.css'
 import { useState } from 'react'
 import { useTodoStore } from '../../store/todo.store.ts'
-import { type Filter, FILTER_FN } from '../../model/todo.ts'
 import { TodoFilter } from '../todo-filter/todo-filter.tsx'
-
-export interface Props {
-  selectedFilter: Filter
-}
+import Spinner from '../../../../common/component/spinner/spinner.tsx'
+import { FILTER_FN } from '../../model/filter.ts'
+import type { UpsertTodo } from '../../model/todo.ts'
 
 function TodoList() {
   const [text, setText] = useState('')
 
-  const { todos, loading, selectedFilter, create } = useTodoStore()
+  const { todos, loading, error, selectedFilter, create } = useTodoStore()
 
   const sortedTodos = [...todos].sort((a, b) => parseInt(a.id) - parseInt(b.id))
   const filteredTodos = sortedTodos.filter(FILTER_FN[selectedFilter])
@@ -20,8 +18,14 @@ function TodoList() {
   const noFilteredTodos = todos.length > 0 && filteredTodos.length === 0
 
   const commitNew = () => {
-    if (!text.trim()) return
-    create(text.trim())
+    const trimmedText = text.trim()
+    if (!trimmedText) return
+
+    const todo: UpsertTodo = {
+      text: trimmedText,
+      complete: false
+    }
+    create(todo)
     setText('')
   }
 
@@ -32,7 +36,8 @@ function TodoList() {
     if (key === 'Escape') setText('')
   }
 
-  if (loading) return <p>Loading...</p>
+  if (loading) return <Spinner message="Loading todos..." />
+  if (error) return <p className={styles.error}>{error}</p>
 
   return (
     <div className={styles.container}>

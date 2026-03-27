@@ -3,5 +3,3 @@ export interface Todo {
   text: string
   complete: boolean
 }
-
-export type UpsertTodo = Omit<Todo, 'id'>

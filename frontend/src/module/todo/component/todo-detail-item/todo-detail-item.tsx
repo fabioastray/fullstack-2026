@@ -1,15 +1,21 @@
 import styles from './todo-detail-item.module.css'
 import { useTodoStore } from '../../store/todo.store'
 import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import Spinner from '../../../../common/component/spinner/spinner.tsx'
 
 export interface Props {
-  id: string | undefined
+  id: string
 }
 
 function TodoDetailItem({ id }: Props) {
-  const { getTodoById } = useTodoStore()
+  const { loading, error, selectedTodo } = useTodoStore()
 
-  const todo = id ? getTodoById(id) : undefined
+  useEffect(() => {
+    if (id) useTodoStore.getState().findOne(id)
+  }, [id])
+
+  if (loading) return <Spinner message="Loading todo..." />
 
   return (
     <div className={styles.container}>
@@ -18,10 +24,13 @@ function TodoDetailItem({ id }: Props) {
           ← Back
         </Link>
       </div>
-      {!todo && <span>TODO not found!</span>}
-      {todo && (
-        <p className={`${styles.text} ${todo.complete ? styles.done : ''}`}>
-          {todo.text}
+      {error && <p className={styles.error}>{error}</p>}
+      {!error && !selectedTodo && <span>TODO not found!</span>}
+      {selectedTodo && (
+        <p
+          className={`${styles.text} ${selectedTodo.complete ? styles.done : ''}`}
+        >
+          {selectedTodo.text}
         </p>
       )}
     </div>

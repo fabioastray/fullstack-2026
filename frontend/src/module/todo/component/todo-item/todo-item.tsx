@@ -1,11 +1,8 @@
 import { useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
-import type { Todo } from '../../model/todo.ts'
+import type { Todo, UpsertTodo } from '../../model/todo.ts'
 import styles from './todo-item.module.css'
 import { useNavigate } from 'react-router-dom'
 import { useTodoStore } from '../../store/todo.store.ts'
-
-const EDIT_DEBOUNCE_MS = 500
 
 export interface Props {
   todo: Todo
@@ -15,33 +12,36 @@ function TodoItem({ todo }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(todo.text)
   const navigate = useNavigate()
-  const { toggle, edit, remove } = useTodoStore()
-
-  const debouncedEdit = useDebouncedCallback(
-    (text: string) => edit(todo.id, text),
-    EDIT_DEBOUNCE_MS
-  )
+  const { update, remove } = useTodoStore()
 
   const commitEdit = () => {
-    debouncedEdit.flush()
+    const upsertTodo: UpsertTodo = {
+      text: editText,
+      complete: todo.complete
+    }
+    update(todo.id, upsertTodo)
     setIsEditing(false)
   }
 
-  const onChange = (value: string) => {
-    setEditText(value)
-    debouncedEdit(value)
-  }
+  const onChange = (value: string) => setEditText(value)
 
   const onKeyDown = (key: string) => {
     if (key === 'Enter') commitEdit()
     if (key === 'Escape') {
-      debouncedEdit.cancel()
       setEditText(todo.text)
       setIsEditing(false)
     }
   }
 
-  const onClick = (id: string) => navigate(`/todos/${id}`)
+  const onClick = () => navigate(`/todos/${todo.id}`)
+
+  const toggleComplete = () => {
+    const upsertTodo: UpsertTodo = {
+      text: todo.text,
+      complete: !todo.complete
+    }
+    update(todo.id, upsertTodo)
+  }
 
   if (isEditing) {
     return (
@@ -63,11 +63,11 @@ function TodoItem({ todo }: Props) {
         className={styles.checkbox}
         type="checkbox"
         checked={todo.complete}
-        onChange={() => toggle(todo.id)}
+        onChange={() => toggleComplete()}
       />
       <span
         className={`${styles.label} ${todo.complete ? styles.done : ''}`}
-        onClick={() => onClick(todo.id)}
+        onClick={() => onClick()}
         title="Double tap to edit"
       >
         {todo.text}

@@ -5,14 +5,12 @@ import { MemoryRouter } from 'react-router-dom'
 import TodoItem from './todo-item.tsx'
 import type { Todo } from '../../model/todo.ts'
 
-const mockToggle = vi.fn()
-const mockEdit = vi.fn()
+const mockUpdate = vi.fn()
 const mockRemove = vi.fn()
 
 vi.mock('../../store/todo.store.ts', () => ({
   useTodoStore: () => ({
-    toggle: mockToggle,
-    edit: mockEdit,
+    update: mockUpdate,
     remove: mockRemove
   })
 }))
@@ -44,10 +42,10 @@ describe('TodoItem', () => {
     expect(screen.getByRole('checkbox')).toBeChecked()
   })
 
-  it('calls toggle with the todo id when checkbox is clicked', async () => {
+  it('calls update with toggled complete when checkbox is clicked', async () => {
     renderItem()
     await userEvent.click(screen.getByRole('checkbox'))
-    expect(mockToggle).toHaveBeenCalledWith('1')
+    expect(mockUpdate).toHaveBeenCalledWith('1', { text: 'Buy milk', complete: true })
   })
 
   it('calls remove with the todo id when remove button is clicked', async () => {
@@ -62,13 +60,13 @@ describe('TodoItem', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument()
   })
 
-  it('calls edit with updated text when Enter is pressed', async () => {
+  it('calls update with updated text when Enter is pressed', async () => {
     renderItem()
     await userEvent.click(screen.getByTitle('Edit'))
     const input = screen.getByRole('textbox')
     await userEvent.clear(input)
     await userEvent.type(input, 'Buy oat milk{Enter}')
-    expect(mockEdit).toHaveBeenCalledWith('1', 'Buy oat milk')
+    expect(mockUpdate).toHaveBeenCalledWith('1', { text: 'Buy oat milk', complete: false })
   })
 
   it('cancels edit and reverts text on Escape', async () => {
@@ -77,7 +75,7 @@ describe('TodoItem', () => {
     const input = screen.getByRole('textbox')
     await userEvent.clear(input)
     await userEvent.type(input, 'Something else{Escape}')
-    expect(mockEdit).not.toHaveBeenCalled()
+    expect(mockUpdate).not.toHaveBeenCalled()
     expect(screen.getByText('Buy milk')).toBeInTheDocument()
   })
 })

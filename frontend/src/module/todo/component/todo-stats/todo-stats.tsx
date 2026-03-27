@@ -2,7 +2,7 @@ import styles from './todo-stats.module.css'
 import { useTodoStore } from '../../store/todo.store.ts'
 
 function TodoStats() {
-  const { todos, loading } = useTodoStore()
+  const { todos, loading, error } = useTodoStore()
 
   const total = todos.length
   const complete = todos.filter((t) => t.complete).length
@@ -10,25 +10,26 @@ function TodoStats() {
 
   const completed = total > 0 && pending === 0
 
-  if (!loading)
-    return (
-      <div className={styles.stats}>
-        <span className={styles.stat}>
-          Total: <span>{total}</span>
+  if (loading || error) return null
+
+  return (
+    <div className={styles.stats}>
+      <span className={styles.stat}>
+        Total: <span>{total}</span>
+      </span>
+      <span className={styles.stat}>
+        Pending: <span>{pending}</span>
+      </span>
+      <span className={styles.stat}>
+        Complete: <span>{complete}</span>
+      </span>
+      {completed && (
+        <span className={styles.fireworks}>
+          🎆 You've completed your todos!
         </span>
-        <span className={styles.stat}>
-          Pending: <span>{pending}</span>
-        </span>
-        <span className={styles.stat}>
-          Complete: <span>{complete}</span>
-        </span>
-        {completed && (
-          <span className={styles.fireworks}>
-            🎆 You've completed your todos!
-          </span>
-        )}
-      </div>
-    )
+      )}
+    </div>
+  )
 }
 
 export default TodoStats
