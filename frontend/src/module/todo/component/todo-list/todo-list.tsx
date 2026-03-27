@@ -10,7 +10,8 @@ import type { UpsertTodo } from '../../model/todo.ts'
 function TodoList() {
   const [text, setText] = useState('')
 
-  const { todos, loading, creating, error, selectedFilter, create } = useTodoStore()
+  const { todos, loading, creating, error, selectedFilter, create } =
+    useTodoStore()
 
   const sortedTodos = [...todos].sort((a, b) => parseInt(a.id) - parseInt(b.id))
   const filteredTodos = sortedTodos.filter(FILTER_FN[selectedFilter])
