@@ -45,7 +45,10 @@ describe('TodoItem', () => {
   it('calls update with toggled complete when checkbox is clicked', async () => {
     renderItem()
     await userEvent.click(screen.getByRole('checkbox'))
-    expect(mockUpdate).toHaveBeenCalledWith('1', { text: 'Buy milk', complete: true })
+    expect(mockUpdate).toHaveBeenCalledWith('1', {
+      text: 'Buy milk',
+      complete: true
+    })
   })
 
   it('calls remove with the todo id when remove button is clicked', async () => {
@@ -66,7 +69,10 @@ describe('TodoItem', () => {
     const input = screen.getByRole('textbox')
     await userEvent.clear(input)
     await userEvent.type(input, 'Buy oat milk{Enter}')
-    expect(mockUpdate).toHaveBeenCalledWith('1', { text: 'Buy oat milk', complete: false })
+    expect(mockUpdate).toHaveBeenCalledWith('1', {
+      text: 'Buy oat milk',
+      complete: false
+    })
   })
 
   it('cancels edit and reverts text on Escape', async () => {
