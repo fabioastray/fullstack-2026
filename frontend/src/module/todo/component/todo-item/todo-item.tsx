@@ -2,22 +2,23 @@ import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import type { Todo } from '../../model/todo.ts'
 import styles from './todo-item.module.css'
+import { useNavigate } from 'react-router-dom'
+import { useTodoStore } from '../../store/todo.store.ts'
 
 const EDIT_DEBOUNCE_MS = 500
 
 export interface Props {
   todo: Todo
-  onToggle: (id: string) => void
-  onEdit: (id: string, text: string) => void
-  onDelete: (id: string) => void
 }
 
-function TodoItem({ todo, onToggle, onEdit, onDelete }: Props) {
+function TodoItem({ todo }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(todo.text)
+  const navigate = useNavigate()
+  const { toggle, edit, remove } = useTodoStore()
 
   const debouncedEdit = useDebouncedCallback(
-    (text: string) => onEdit(todo.id, text),
+    (text: string) => edit(todo.id, text),
     EDIT_DEBOUNCE_MS
   )
 
@@ -40,6 +41,8 @@ function TodoItem({ todo, onToggle, onEdit, onDelete }: Props) {
     }
   }
 
+  const onClick = (id: string) => navigate(`/todos/${id}`)
+
   if (isEditing) {
     return (
       <li className={styles.item}>
@@ -50,13 +53,6 @@ function TodoItem({ todo, onToggle, onEdit, onDelete }: Props) {
           onKeyDown={(e) => onKeyDown(e.key)}
           autoFocus
         />
-        <button
-          className={styles.deleteButton}
-          onClick={() => onDelete(todo.id)}
-          title="Remove"
-        >
-          ✕
-        </button>
       </li>
     )
   }
@@ -67,18 +63,26 @@ function TodoItem({ todo, onToggle, onEdit, onDelete }: Props) {
         className={styles.checkbox}
         type="checkbox"
         checked={todo.complete}
-        onChange={() => onToggle(todo.id)}
+        onChange={() => toggle(todo.id)}
       />
       <span
         className={`${styles.label} ${todo.complete ? styles.done : ''}`}
-        onDoubleClick={() => setIsEditing(true)}
+        onClick={() => onClick(todo.id)}
         title="Double tap to edit"
       >
         {todo.text}
       </span>
+      <p>{todo.complete ? '✅ Complete' : '⏳ Pending'}</p>
       <button
         className={styles.deleteButton}
-        onClick={() => onDelete(todo.id)}
+        onClick={() => setIsEditing(true)}
+        title="Edit"
+      >
+        ✏️
+      </button>
+      <button
+        className={styles.deleteButton}
+        onClick={() => remove(todo.id)}
         title="Remove"
       >
         ✕

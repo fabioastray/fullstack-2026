@@ -1,0 +1,17 @@
+.nav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.navAuth {
+  margin-left: auto;
+}
+
+.navLink {
+  font-weight: normal;
+}
+
+.navLinkActive {
+  font-weight: bold;
+}

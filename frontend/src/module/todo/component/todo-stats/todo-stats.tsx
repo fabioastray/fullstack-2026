@@ -1,12 +1,9 @@
-import type { Todo } from '../../model/todo.ts'
 import styles from './todo-stats.module.css'
+import { useTodoStore } from '../../store/todo.store.ts'
 
-export interface Props {
-  loading: boolean
-  todos: Todo[]
-}
+function TodoStats() {
+  const { todos, loading } = useTodoStore()
 
-function TodoStats({ loading, todos }: Props) {
   const total = todos.length
   const complete = todos.filter((t) => t.complete).length
   const pending = total - complete
@@ -26,7 +23,9 @@ function TodoStats({ loading, todos }: Props) {
           Complete: <span>{complete}</span>
         </span>
         {completed && (
-          <span className={styles.fireworks}>🎆 Completed your list!</span>
+          <span className={styles.fireworks}>
+            🎆 You've completed your todos!
+          </span>
         )}
       </div>
     )

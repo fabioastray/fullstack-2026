@@ -1,4 +1,4 @@
-import type { Todo } from '../component/todo-list/model/todo.ts'
+import type { Todo } from '../model/todo.ts'
 
 const STORAGE_KEY = 'todos'
 const DELAY = 200

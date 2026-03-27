@@ -1,43 +1,27 @@
 import TodoItem from '../todo-item/todo-item.tsx'
-import type { Todo } from '../../model/todo.ts'
 import styles from './todo-list.module.css'
 import { useState } from 'react'
+import { useTodoStore } from '../../store/todo.store.ts'
+import { type Filter, FILTER_FN } from '../../model/todo.ts'
+import { TodoFilter } from '../todo-filter/todo-filter.tsx'
 
 export interface Props {
-  loading: boolean
-  todos: Todo[]
-  onToggle: (id: string) => void
-  onCreate: (text: string) => void
-  onEdit: (id: string, text: string) => void
-  onDelete: (id: string) => void
+  selectedFilter: Filter
 }
 
-const FILTERS = ['all', 'pending', 'completed'] as const
-type Filter = (typeof FILTERS)[number]
-const FILTER_FN: Record<Filter, (t: Todo) => boolean> = {
-  all: () => true,
-  pending: (t) => !t.complete,
-  completed: (t) => t.complete
-}
-
-function TodoList({
-  loading,
-  todos,
-  onToggle,
-  onCreate,
-  onEdit,
-  onDelete
-}: Props) {
-  const [filter, setFilter] = useState<Filter>(FILTERS[0])
+function TodoList() {
   const [text, setText] = useState('')
 
-  const filteredTodos = todos.filter(FILTER_FN[filter])
+  const { todos, loading, selectedFilter, create } = useTodoStore()
+
+  const sortedTodos = [...todos].sort((a, b) => parseInt(a.id) - parseInt(b.id))
+  const filteredTodos = sortedTodos.filter(FILTER_FN[selectedFilter])
   const noTodos = todos.length === 0
   const noFilteredTodos = todos.length > 0 && filteredTodos.length === 0
 
   const commitNew = () => {
     if (!text.trim()) return
-    onCreate(text.trim())
+    create(text.trim())
     setText('')
   }
 
@@ -72,30 +56,16 @@ function TodoList({
         </button>
       </div>
 
-      <div className={styles.filterRow}>
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            className={`${styles.filterButton} ${filter === f ? styles.active : ''}`}
-            onClick={() => setFilter(f)}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+      <TodoFilter />
 
       {noTodos && <p className={styles.empty}>No todos yet.</p>}
-      {noFilteredTodos && <p className={styles.empty}>No {filter} todos.</p>}
+      {noFilteredTodos && (
+        <p className={styles.empty}>No {selectedFilter} todos.</p>
+      )}
 
       <ul className={styles.list}>
         {filteredTodos.map((todo) => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            onToggle={onToggle}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
+          <TodoItem key={todo.id} todo={todo} />
         ))}
       </ul>
     </div>

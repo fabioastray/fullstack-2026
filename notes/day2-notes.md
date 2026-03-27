@@ -1,4 +1,4 @@
-* How components are composed in your Todo app?
+* How components are composed in your TodoModule app?
   * we have a smart component(app) responsible for fetching the items, sort and provide them to its children
   * child components receive the items, present them and allow to add, edit, remove and toggle them by notifying the parent via events. they are: 
     * the todo-list, responsible for listing the todos and initializing new ones
