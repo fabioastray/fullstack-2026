@@ -12,7 +12,8 @@ function TodoItem({ todo }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(todo.text)
   const navigate = useNavigate()
-  const { update, remove } = useTodoStore()
+  const { update, remove, mutatingId } = useTodoStore()
+  const isBusy = mutatingId === todo.id
 
   const commitEdit = () => {
     const upsertTodo: UpsertTodo = {
@@ -58,11 +59,14 @@ function TodoItem({ todo }: Props) {
   }
 
   return (
-    <li className={`${styles.item} ${todo.complete ? styles.complete : ''}`}>
+    <li
+      className={`${styles.item} ${todo.complete ? styles.complete : ''} ${isBusy ? styles.busy : ''}`}
+    >
       <input
         className={styles.checkbox}
         type="checkbox"
         checked={todo.complete}
+        disabled={isBusy}
         onChange={() => toggleComplete()}
       />
       <span
@@ -77,6 +81,7 @@ function TodoItem({ todo }: Props) {
         className={styles.deleteButton}
         onClick={() => setIsEditing(true)}
         title="Edit"
+        disabled={isBusy}
       >
         ✏️
       </button>
@@ -84,6 +89,7 @@ function TodoItem({ todo }: Props) {
         className={styles.deleteButton}
         onClick={() => remove(todo.id)}
         title="Remove"
+        disabled={isBusy}
       >
         ✕
       </button>

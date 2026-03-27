@@ -7,6 +7,8 @@ export interface TodoStore {
   todos: Todo[]
   selectedTodo: Todo | undefined
   loading: boolean
+  creating: boolean
+  mutatingId: string | null
   error: string | null
   filters: Filter[]
   selectedFilter: Filter
@@ -28,6 +30,8 @@ export const useTodoStore = create<TodoStore>()((set, get) => ({
   todos: [],
   selectedTodo: undefined,
   loading: true,
+  creating: false,
+  mutatingId: null,
   error: null,
   filters: FILTERS,
   selectedFilter: 'all',
@@ -54,36 +58,36 @@ export const useTodoStore = create<TodoStore>()((set, get) => ({
 
   // Setters
   create: async (upsertTodo: UpsertTodo) => {
-    set({ loading: true, error: null })
+    set({ creating: true, error: null })
     try {
       const todo = await service.create(upsertTodo)
-      set({ loading: false, todos: [...get().todos, todo] })
+      set({ creating: false, todos: [...get().todos, todo] })
     } catch (e) {
-      set({ loading: false, error: toError(e, 'Failed to create todo') })
+      set({ creating: false, error: toError(e, 'Failed to create todo') })
     }
   },
   update: async (id: string, upsertTodo: UpsertTodo) => {
-    set({ loading: true, error: null })
+    set({ mutatingId: id, error: null })
     try {
       const todo = await service.update(id, upsertTodo)
       set({
-        loading: false,
+        mutatingId: null,
         todos: get().todos.map((t) => (t.id === todo.id ? todo : t))
       })
     } catch (e) {
-      set({ loading: false, error: toError(e, 'Failed to update todo') })
+      set({ mutatingId: null, error: toError(e, 'Failed to update todo') })
     }
   },
   remove: async (id: string) => {
-    set({ loading: true, error: null })
+    set({ mutatingId: id, error: null })
     try {
       await service.remove(id)
       set({
-        loading: false,
+        mutatingId: null,
         todos: get().todos.filter((t) => t.id !== id)
       })
     } catch (e) {
-      set({ loading: false, error: toError(e, 'Failed to remove todo') })
+      set({ mutatingId: null, error: toError(e, 'Failed to remove todo') })
     }
   },
   setFilter: (filter: Filter) =>

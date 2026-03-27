@@ -10,7 +10,7 @@ import type { UpsertTodo } from '../../model/todo.ts'
 function TodoList() {
   const [text, setText] = useState('')
 
-  const { todos, loading, error, selectedFilter, create } = useTodoStore()
+  const { todos, loading, creating, error, selectedFilter, create } = useTodoStore()
 
   const sortedTodos = [...todos].sort((a, b) => parseInt(a.id) - parseInt(b.id))
   const filteredTodos = sortedTodos.filter(FILTER_FN[selectedFilter])
@@ -49,15 +49,16 @@ function TodoList() {
           className={styles.addInput}
           placeholder="What needs to be done?"
           value={text}
+          disabled={creating}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => onKeyDown(e.key)}
         />
         <button
           className={styles.addButton}
           onClick={commitNew}
-          disabled={!text.trim()}
+          disabled={!text.trim() || creating}
         >
-          Add
+          {creating ? 'Adding...' : 'Add'}
         </button>
       </div>
 
