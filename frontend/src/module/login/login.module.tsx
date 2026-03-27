@@ -9,7 +9,9 @@ export default function LoginPage() {
   const handleLogin = () => {
     login()
     // Redirect back to intended page, or todos if no specific location
-    const from = (location.state as any)?.from?.pathname || '/todos'
+    const from =
+      (location.state as { from?: { pathname?: string } })?.from?.pathname ||
+      '/todos'
     navigate(from, { replace: true })
   }
 
