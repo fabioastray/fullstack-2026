@@ -3,7 +3,7 @@ import { TodosService } from './todos.service.ts'
 
 export class TodosHttpService extends TodosService {
   host = import.meta.env.VITE_API_HOST
-  baseUrl = 'api/'
+  baseUrl = '/api/'
 
   async findAll(): Promise<Todo[]> {
     const endpoint = `${this.host}${this.baseUrl}v1/todos`
