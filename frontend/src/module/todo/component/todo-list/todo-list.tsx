@@ -1,17 +1,18 @@
 import TodoItem from '../todo-item/todo-item.tsx'
 import styles from './todo-list.module.css'
 import { useState } from 'react'
-import { useTodoStore } from '../../store/todo.store.ts'
+import { useFilterStore } from '../../store/filter.store.ts'
 import { TodoFilter } from '../todo-filter/todo-filter.tsx'
 import Spinner from '../../../../common/component/spinner/spinner.tsx'
 import { FILTER_FN } from '../../model/filter.ts'
 import type { UpsertTodo } from '../../model/todo.ts'
+import { useTodos } from '../../hooks/useTodos.ts'
 
 function TodoList() {
   const [text, setText] = useState('')
 
-  const { todos, loading, creating, error, selectedFilter, create } =
-    useTodoStore()
+  const { todos, loading, creating, error, create } = useTodos()
+  const { selectedFilter } = useFilterStore()
 
   const sortedTodos = [...todos].sort((a, b) => parseInt(a.id) - parseInt(b.id))
   const filteredTodos = sortedTodos.filter(FILTER_FN[selectedFilter])

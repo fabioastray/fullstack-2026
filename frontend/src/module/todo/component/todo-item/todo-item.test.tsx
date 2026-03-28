@@ -8,10 +8,11 @@ import type { Todo } from '../../model/todo.ts'
 const mockUpdate = vi.fn()
 const mockRemove = vi.fn()
 
-vi.mock('../../store/todo.store.ts', () => ({
-  useTodoStore: () => ({
+vi.mock('../../hooks/useTodos.ts', () => ({
+  useTodos: () => ({
     update: mockUpdate,
-    remove: mockRemove
+    remove: mockRemove,
+    mutatingId: null
   })
 }))
 
@@ -45,9 +46,9 @@ describe('TodoItem', () => {
   it('calls update with toggled complete when checkbox is clicked', async () => {
     renderItem()
     await userEvent.click(screen.getByRole('checkbox'))
-    expect(mockUpdate).toHaveBeenCalledWith('1', {
-      text: 'Buy milk',
-      complete: true
+    expect(mockUpdate).toHaveBeenCalledWith({
+      id: '1',
+      todo: { text: 'Buy milk', complete: true }
     })
   })
 
@@ -69,9 +70,9 @@ describe('TodoItem', () => {
     const input = screen.getByRole('textbox')
     await userEvent.clear(input)
     await userEvent.type(input, 'Buy oat milk{Enter}')
-    expect(mockUpdate).toHaveBeenCalledWith('1', {
-      text: 'Buy oat milk',
-      complete: false
+    expect(mockUpdate).toHaveBeenCalledWith({
+      id: '1',
+      todo: { text: 'Buy oat milk', complete: false }
     })
   })
 

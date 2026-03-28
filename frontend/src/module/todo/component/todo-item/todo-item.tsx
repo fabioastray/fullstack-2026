@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Todo, UpsertTodo } from '../../model/todo.ts'
 import styles from './todo-item.module.css'
 import { useNavigate } from 'react-router-dom'
-import { useTodoStore } from '../../store/todo.store.ts'
+import { useTodos } from '../../hooks/useTodos.ts'
 
 export interface Props {
   todo: Todo
@@ -12,7 +12,7 @@ function TodoItem({ todo }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(todo.text)
   const navigate = useNavigate()
-  const { update, remove, mutatingId } = useTodoStore()
+  const { update, remove, mutatingId } = useTodos()
   const isBusy = mutatingId === todo.id
 
   const commitEdit = () => {
@@ -20,7 +20,7 @@ function TodoItem({ todo }: Props) {
       text: editText,
       complete: todo.complete
     }
-    update(todo.id, upsertTodo)
+    update({ id: todo.id, todo: upsertTodo })
     setIsEditing(false)
   }
 
@@ -37,11 +37,7 @@ function TodoItem({ todo }: Props) {
   const onClick = () => navigate(`/todos/${todo.id}`)
 
   const toggleComplete = () => {
-    const upsertTodo: UpsertTodo = {
-      text: todo.text,
-      complete: !todo.complete
-    }
-    update(todo.id, upsertTodo)
+    update({ id: todo.id, todo: { text: todo.text, complete: !todo.complete } })
   }
 
   if (isEditing) {
@@ -54,6 +50,9 @@ function TodoItem({ todo }: Props) {
           onKeyDown={(e) => onKeyDown(e.key)}
           autoFocus
         />
+        <button className={styles.saveButton} onClick={commitEdit}>
+          Save
+        </button>
       </li>
     )
   }

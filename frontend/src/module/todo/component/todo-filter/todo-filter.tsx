@@ -1,8 +1,8 @@
-import { useTodoStore } from '../../store/todo.store.ts'
+import { useFilterStore } from '../../store/filter.store.ts'
 import styles from './todo-filter.module.css'
 
 export function TodoFilter() {
-  const { filters, selectedFilter, setFilter } = useTodoStore()
+  const { filters, selectedFilter, setFilter } = useFilterStore()
 
   return (
     <div className={styles.filterRow}>

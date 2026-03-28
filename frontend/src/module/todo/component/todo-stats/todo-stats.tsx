@@ -1,8 +1,8 @@
 import styles from './todo-stats.module.css'
-import { useTodoStore } from '../../store/todo.store.ts'
+import { useTodos } from '../../hooks/useTodos.ts'
 
 function TodoStats() {
-  const { todos, loading, error } = useTodoStore()
+  const { todos, loading, error } = useTodos()
 
   const total = todos.length
   const complete = todos.filter((t) => t.complete).length
