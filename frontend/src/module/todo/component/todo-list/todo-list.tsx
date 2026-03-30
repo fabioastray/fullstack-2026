@@ -14,7 +14,7 @@ function TodoList() {
   const { todos, loading, creating, error, create } = useTodos()
   const { selectedFilter } = useFilterStore()
 
-  const sortedTodos = [...todos].sort((a, b) => parseInt(a.id) - parseInt(b.id))
+  const sortedTodos = [...todos].sort((a, b) => a.id - b.id)
   const filteredTodos = sortedTodos.filter(FILTER_FN[selectedFilter])
   const noTodos = todos.length === 0
   const noFilteredTodos = todos.length > 0 && filteredTodos.length === 0

@@ -6,7 +6,7 @@ const service = new TodosHttpService()
 
 export const TODO_KEYS = {
   all: ['todos'] as const,
-  one: (id: string) => ['todos', id] as const
+  one: (id: number) => ['todos', id] as const
 }
 
 export function useTodos() {
@@ -23,13 +23,13 @@ export function useTodos() {
   })
 
   const update = useMutation({
-    mutationFn: ({ id, todo }: { id: string; todo: UpsertTodo }) =>
+    mutationFn: ({ id, todo }: { id: number; todo: UpsertTodo }) =>
       service.update(id, todo),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: TODO_KEYS.all })
   })
 
   const remove = useMutation({
-    mutationFn: (id: string) => service.remove(id),
+    mutationFn: (id: number) => service.remove(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: TODO_KEYS.all })
   })
 
@@ -43,15 +43,16 @@ export function useTodos() {
     remove: remove.mutate,
     mutatingId:
       update.isPending || remove.isPending
-        ? ((update.variables?.id ?? remove.variables) as string)
+        ? (update.variables?.id ?? remove.variables)
         : null
   }
 }
 
-export function useTodo(id: string) {
+export function useTodo(id: number | undefined) {
   const query = useQuery({
-    queryKey: TODO_KEYS.one(id),
-    queryFn: () => service.findOne(id)
+    queryKey: TODO_KEYS.one(id!),
+    queryFn: () => service.findOne(id!),
+    enabled: id !== undefined
   })
 
   return {

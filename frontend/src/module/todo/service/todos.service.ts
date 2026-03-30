@@ -12,8 +12,8 @@ export abstract class TodosService {
   }
 
   abstract findAll(): Promise<Todo[]>
-  abstract findOne(id: string): Promise<Todo>
+  abstract findOne(id: number): Promise<Todo>
   abstract create(todo: Partial<Todo>): Promise<Todo>
-  abstract update(id: string, todo: Partial<Todo>): Promise<Todo>
-  abstract remove(id: string): Promise<void>
+  abstract update(id: number, todo: Partial<Todo>): Promise<Todo>
+  abstract remove(id: number): Promise<void>
 }

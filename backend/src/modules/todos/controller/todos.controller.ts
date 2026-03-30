@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Version
@@ -23,7 +24,7 @@ export class TodosController {
 
   @Version('1')
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.todosService.findOne(id)
   }
 
@@ -35,13 +36,16 @@ export class TodosController {
 
   @Version('1')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTodo: UpsertTodo) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTodo: UpsertTodo
+  ) {
     return this.todosService.update(id, updateTodo)
   }
 
   @Version('1')
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.todosService.remove(id)
   }
 }

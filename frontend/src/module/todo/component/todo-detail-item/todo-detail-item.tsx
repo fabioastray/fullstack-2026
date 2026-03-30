@@ -4,11 +4,11 @@ import Spinner from '../../../../common/component/spinner/spinner.tsx'
 import { useTodo } from '../../hooks/useTodos.ts'
 
 export interface Props {
-  id: string | undefined
+  id: number | undefined
 }
 
 function TodoDetailItem({ id }: Props) {
-  const { todo, loading, error } = useTodo(id ?? '')
+  const { todo, loading, error } = useTodo(id)
 
   if (loading) return <Spinner message="Loading todo..." />
 

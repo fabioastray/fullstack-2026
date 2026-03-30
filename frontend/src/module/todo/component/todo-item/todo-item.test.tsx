@@ -16,7 +16,7 @@ vi.mock('../../hooks/useTodos.ts', () => ({
   })
 }))
 
-const todo: Todo = { id: '1', text: 'Buy milk', complete: false }
+const todo: Todo = { id: 1, text: 'Buy milk', complete: false }
 
 const renderItem = (overrides: Partial<Todo> = {}) =>
   render(
@@ -47,7 +47,7 @@ describe('TodoItem', () => {
     renderItem()
     await userEvent.click(screen.getByRole('checkbox'))
     expect(mockUpdate).toHaveBeenCalledWith({
-      id: '1',
+      id: 1,
       todo: { text: 'Buy milk', complete: true }
     })
   })
@@ -55,7 +55,7 @@ describe('TodoItem', () => {
   it('calls remove with the todo id when remove button is clicked', async () => {
     renderItem()
     await userEvent.click(screen.getByTitle('Remove'))
-    expect(mockRemove).toHaveBeenCalledWith('1')
+    expect(mockRemove).toHaveBeenCalledWith(1)
   })
 
   it('enters edit mode when edit button is clicked', async () => {
@@ -71,7 +71,7 @@ describe('TodoItem', () => {
     await userEvent.clear(input)
     await userEvent.type(input, 'Buy oat milk{Enter}')
     expect(mockUpdate).toHaveBeenCalledWith({
-      id: '1',
+      id: 1,
       todo: { text: 'Buy oat milk', complete: false }
     })
   })

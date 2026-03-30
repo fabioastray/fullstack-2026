@@ -1,57 +1,51 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { Todo } from '../dto/todo.dto'
 import { UpsertTodo } from '../dto/upsert-todo.dto'
+import { PrismaService } from '../../../prisma/prisma.service'
 
 @Injectable()
 export class TodosService {
-  private todos: Todo[] = []
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): Todo[] {
-    return this.todos
+  notFoundException(id: number): never {
+    throw new NotFoundException(`Todo ${id} not found`)
   }
 
-  findOne(id: string): Todo {
-    const todo = this.todos.find((todo) => todo.id === id)
+  async findAll(): Promise<Todo[]> {
+    return this.prisma.todo.findMany({
+      orderBy: { id: 'desc' }
+    })
+  }
 
-    if (!todo) throw new NotFoundException(`Todo ${id} not found`)
+  async findOne(id: number): Promise<Todo> {
+    const todo = await this.prisma.todo.findUnique({
+      where: { id }
+    })
+
+    if (!todo) this.notFoundException(id)
 
     return todo
   }
 
-  nextId(): string {
-    const nextId =
-      this.todos.length === 0
-        ? 1
-        : Math.max(...this.todos.map((todo) => parseInt(todo.id))) + 1
-
-    return nextId.toString()
+  async create(create: UpsertTodo): Promise<Todo> {
+    return this.prisma.todo.create({
+      data: { text: create.text, complete: create.complete }
+    })
   }
 
-  create(createTodo: UpsertTodo): Todo {
-    const todo: Todo = {
-      id: this.nextId(),
-      text: createTodo.text,
-      complete: createTodo.complete ?? false
+  async update(id: number, update: Partial<UpsertTodo>): Promise<Todo> {
+    return this.prisma.todo.update({
+      where: { id },
+      data: { text: update.text, complete: update.complete }
+    })
+  }
+
+  async remove(id: number): Promise<Todo> {
+    try {
+      return await this.prisma.todo.delete({ where: { id } })
+    } catch (e: unknown) {
+      if (this.prisma.wasErrorDeleting(e)) this.notFoundException(id)
+      throw e
     }
-
-    this.todos.push(todo)
-
-    return todo
-  }
-
-  update(id: string, update: Partial<UpsertTodo>): Todo {
-    const todo = this.findOne(id)
-
-    Object.assign(todo, update)
-
-    return todo
-  }
-
-  remove(id: string) {
-    const index = this.todos.findIndex((todo) => todo.id === id)
-
-    if (index === -1) throw new NotFoundException()
-
-    this.todos.splice(index, 1)
   }
 }

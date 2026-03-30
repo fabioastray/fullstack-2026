@@ -16,7 +16,7 @@ export class TodosHttpService extends TodosService {
     )
   }
 
-  async findOne(id: string): Promise<Todo> {
+  async findOne(id: number): Promise<Todo> {
     const endpoint = `${this.host}${this.baseUrl}v1/todos/${id}`
 
     return fetch(endpoint).then((res) =>
@@ -42,7 +42,7 @@ export class TodosHttpService extends TodosService {
     )
   }
 
-  async update(id: string, todo: UpsertTodo): Promise<Todo> {
+  async update(id: number, todo: UpsertTodo): Promise<Todo> {
     const endpoint = `${this.host}${this.baseUrl}v1/todos/${id}`
 
     return fetch(endpoint, {
@@ -57,7 +57,7 @@ export class TodosHttpService extends TodosService {
     )
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const endpoint = `${this.host}${this.baseUrl}v1/todos/${id}`
 
     await fetch(endpoint, {

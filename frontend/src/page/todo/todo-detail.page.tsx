@@ -4,5 +4,7 @@ import TodoDetailItem from '../../module/todo/component/todo-detail-item/todo-de
 export default function TodoDetailPage() {
   const { id } = useParams<{ id: string }>()
 
-  return <TodoDetailItem id={id} />
+  if (!id) return <div>Invalid todo</div>
+
+  return <TodoDetailItem id={parseInt(id)} />
 }
