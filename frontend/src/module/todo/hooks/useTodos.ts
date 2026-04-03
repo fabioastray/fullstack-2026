@@ -34,7 +34,8 @@ export function useTodos() {
   })
 
   return {
-    todos: query.data ?? [],
+    todos: query.data?.items ?? [],
+    total: query.data?.total ?? 0,
     loading: query.isLoading,
     error: query.error?.message ?? null,
     creating: create.isPending,

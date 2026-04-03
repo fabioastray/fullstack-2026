@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Version
 } from '@nestjs/common'
 import { TodosService } from '../services/todos.service'
@@ -18,8 +19,11 @@ export class TodosController {
 
   @Version('1')
   @Get()
-  findAll() {
-    return this.todosService.findAll()
+  findAll(
+    @Query('page', new ParseIntPipe({ optional: true })) page: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize: number
+  ) {
+    return this.todosService.findAll(page, pageSize)
   }
 
   @Version('1')

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { Todo } from '../dto/todo.dto'
 import { UpsertTodo } from '../dto/upsert-todo.dto'
 import { PrismaService } from '../../../prisma/prisma.service'
+import { ResultsResponse } from '../../../common/dto/results-response.dto'
 
 @Injectable()
 export class TodosService {
@@ -11,10 +12,35 @@ export class TodosService {
     throw new NotFoundException(`Todo ${id} not found`)
   }
 
-  async findAll(): Promise<Todo[]> {
-    return this.prisma.todo.findMany({
-      orderBy: { id: 'desc' }
-    })
+  async findAll(
+    page?: number,
+    pageSize?: number
+  ): Promise<ResultsResponse<Todo>> {
+    const db = this.prisma.todo
+
+    if (!page || !pageSize) {
+      const items = await db.findMany({
+        orderBy: { id: 'desc' }
+      })
+      return {
+        items,
+        total: items.length
+      }
+    } else {
+      const skip = (page - 1) * pageSize
+      const total = await db.count({})
+
+      const items = await db.findMany({
+        skip,
+        take: pageSize,
+        orderBy: { id: 'desc' }
+      })
+
+      return {
+        items,
+        total
+      }
+    }
   }
 
   async findOne(id: number): Promise<Todo> {

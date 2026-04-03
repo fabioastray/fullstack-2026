@@ -1,15 +1,36 @@
 import type { Todo, UpsertTodo } from '../model/todo.ts'
 import { TodosService } from './todos.service.ts'
+import type { ResultsResponse } from '../../../common/model/results-response.dto.ts'
 
 export class TodosHttpService extends TodosService {
   host = import.meta.env.VITE_API_HOST
   baseUrl = '/api/'
 
-  async findAll(): Promise<Todo[]> {
-    const endpoint = `${this.host}${this.baseUrl}v1/todos`
+  toURLQuery(queryParams: Record<string, string | number | boolean>): string {
+    const query = Object.entries(queryParams)
+      .filter(([key, value]) => !!key && !!value)
+      .reduce((prev, [key, value]) => {
+        prev.set(key, String(value))
+        return prev
+      }, new URLSearchParams())
+
+    return query.size > 0 ? `?${query}` : ''
+  }
+
+  async findAll(
+    page?: number,
+    pageSize?: number
+  ): Promise<ResultsResponse<Todo>> {
+    const queryParams = {
+      ...(page ? { page } : {}),
+      ...(pageSize ? { pageSize } : {})
+    } as Record<string, number>
+
+    const query = this.toURLQuery(queryParams)
+    const endpoint = `${this.host}${this.baseUrl}v1/todos${query}`
 
     return fetch(endpoint).then((res) =>
-      this.handleResponse<Todo[]>(
+      this.handleResponse<ResultsResponse<Todo>>(
         res,
         `Failed to get todos from ${endpoint}: ${res.statusText}`
       )
